@@ -112,12 +112,14 @@ class DataStream:
 
 
 @dataclass
-class Project:
+class Project(db.Model):
     """"""
 
-    id: int = 0
-    name: str = ""
-    start_index = 0
+    __tablename__ = 'project'
+
+    id: int  = db.Column('id', db.Integer, primary_key=True)
+    name: str = db.Column(db.String(100), nullable=False)
+    start_index = db.Column(db.Integer(100), nullable=True)
     data_streams = []
 
     def add_data_stream(self, video_file_path: str, mo_cap_file_path: str = None) -> None:
@@ -134,6 +136,8 @@ class Project:
 
 @dataclass
 class User(db.Model):
+    """"""
+
     __tablename__ = 'user'
 
     id: str = db.Column(
@@ -144,3 +148,4 @@ class User(db.Model):
     )
     email: str = db.Column(db.String(320), nullable=False)
     password: str = db.Column(db.Text, nullable=False)
+    projects: object = db.relationship('Project', backref='user')
