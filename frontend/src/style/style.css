@@ -1,0 +1,40 @@
+* {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+html, body, #root {
+    margin: 0;
+    height: 100%;
+    font-family: sans-serif;
+    font-weight: bolder;
+}
+
+.app {
+    display: grid;
+    grid-template-rows: 75px auto;
+    height: 100%
+}
+
+/* Header styles */
+.header {
+    grid-row: 1;
+    background-color: #607EAA;
+}
+
+h1.header {
+    margin: 0;
+    color: white;
+    font-style: italic;
+    font-size: 35px;
+}
+
+/* Content styles */
+
+.content {
+
+}

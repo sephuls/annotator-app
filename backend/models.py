@@ -4,8 +4,6 @@ from dataclasses import dataclass
 from flask_sqlalchemy import SQLAlchemy
 
 
-TC_FORMAT = "%H:%M:%S:%f"
-
 db = SQLAlchemy()
 
 
@@ -24,7 +22,8 @@ class VideoStream(db.Model):
     id: int = db.Column('id', db.Integer, primary_key=True)
     file_path: str = db.Column(db.String(100), nullable=False)
     fps: float = db.Column(db.Float, nullable=True)
-    mirrored: bool = db.Column(db.Boolean, nullable=True)
+    num_frames: int = db.Column(db.Integer, nullable=True)
+    mirrored: bool = db.Column(db.Boolean, nullable=False)
     data_stream_id: str = db.Column(db.Integer, db.ForeignKey('data_stream.id'))
 
 
@@ -55,9 +54,8 @@ class DataStream(db.Model):
     start_timecode: datetime = db.Column(db.DateTime, nullable=True)
     start_index: int = db.Column(db.Integer, nullable=True)
     end_index: int = db.Column(db.Integer, nullable=True)
-    num_frames: int = db.Column(db.Integer, nullable=True)
 
-    video_stream = db.relationship('VideoStream', backref='data_stream', uselist=False)
+    video_stream = db.relationship('VideoStream', uselist=False, backref='data_stream')
     # mo_cap_stream: MoCapStream = None
 
 

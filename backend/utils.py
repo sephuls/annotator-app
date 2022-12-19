@@ -17,7 +17,7 @@ def timecode_to_index(timecode: datetime, microseconds: bool = False) -> int:
             + frame_number)
 
 
-def get_timecode(media_file: str, mirrored: bool = False) -> Tuple[int, datetime]:
+def get_timecode_QR(media_file: str, mirrored: bool = False) -> Tuple[int, datetime]:
     """"""
 
     frame_nr = 0

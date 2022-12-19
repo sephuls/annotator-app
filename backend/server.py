@@ -1,5 +1,6 @@
-import random
-import pandas as pd
+import utils
+import ffmpeg
+from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from flask_session import Session
@@ -7,6 +8,8 @@ from flask_cors import CORS
 from config import Config
 from models import User, Project, DataStream, VideoStream, db
 
+
+TC_FORMAT = "%H:%M:%S:%f"
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -25,7 +28,7 @@ def get_current_user() -> User:
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    return User.query.filter_by(id=user_id).first()
+    return User.query.filter_by(id=user_id).first(), 200
 
 
 @app.route('/@me', methods=['GET'])
@@ -42,7 +45,7 @@ def API_get_current_user() -> dict:
     return jsonify({
         'email': user.email,
         'id': user.id
-    })
+    }), 200
 
 
 @app.route('/register', methods=['POST'])
@@ -64,7 +67,7 @@ def API_register_user() -> dict:
     return jsonify({
         'email': new_user.email,
         'id': new_user.id
-    })
+    }), 200
 
 
 @app.route('/login', methods=['POST'])
@@ -87,7 +90,7 @@ def API_login_user() -> dict:
     return jsonify({
         'email': user.email,
         'id': user.id
-    })
+    }), 200
 
 
 def populate_db() -> None:
@@ -117,47 +120,19 @@ def API_add_new_project(name):
         app.logger.debug('No projects found')
         return '', 204
 
+@app.route('/projects', methods=['GET'])
+def API_get_projects():
+    user_id = session.get('user_id')
 
-# def sync_data_stream():
-#     def sync(self) -> Tuple[int, datetime, int, int]:
-#         """
-#         Function for configuring meta data for a VideoStream object.
-#         Makes use of meta data extracted from the video file
-#         using the ffmpeg library. When no timecode is found in the meta data
-#         it tries to detect a QR code in the set of frames.
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
 
-#         Tries to set the following variables:
-#             - fps
+    user = User.query.filter_by(id=user_id).first()
 
-#         It returns the following variables to set the parent DataStream object:
-#             - num_frames
-#             - start_timecode
-#             - start_index
-#             - end_index
-#         """
-
-#         # Meta data about the video file are extracted.
-#         meta_data = ffmpeg.probe(self.file_path)["streams"][0]
-#         self.fps = utils.fraction_str_to_float(meta_data['r_frame_rate'])
-#         num_frames = int(meta_data['nb_frames'])
-
-#         # Try to set timecode for start of recording from either meta data or detected QR.
-#         if 'timecode' not in meta_data['tags']:
-#             frame_nr, found_timecode = utils.get_timecode(self.file_path, mirrored=self.mirrored)
-
-#             if frame_nr is None and found_timecode is None:
-#                 print("ERROR: Could not configure VideoStream data from file")
-#                 return None, None, None
-
-#             start_timecode = found_timecode - timedelta(seconds=(frame_nr * (1 / self.fps)))
-
-#         else:
-#             start_timecode = datetime.strptime(meta_data['tags']['timecode'], TC_FORMAT)
-
-#         start_index = utils.timecode_to_index(start_timecode)
-#         end_index = int( start_index + (num_frames * (60 / self.fps)) )
-
-#         return num_frames, start_timecode, start_index, end_index
+    if user.projects:
+        return jsonify(user.projects)
+    else:
+        return '', 204
 
 
 @app.route("/project/<project_id>/<data_stream_id>/add_video_stream", methods=['POST'])
@@ -179,13 +154,72 @@ def API_add_video_stream(project_id, data_stream_id):
     if data_stream is None:
         return jsonify({'error': 'DataStream not found'}), 404
 
-
     video_file_path = request.json['video_file_path']
-    video_stream = VideoStream(file_path=video_file_path)
+    video_stream = VideoStream(file_path=video_file_path, mirrored=False)
 
     data_stream.video_stream = video_stream
+    db.session.commit()
 
     return jsonify(data_stream.video_stream), 200
+
+
+def set_meta_data(data_stream):
+    """"""
+
+    video_stream = data_stream.video_stream
+
+    # Meta data about the video file are extracted.
+    meta_data = ffmpeg.probe(video_stream.file_path)["streams"][0]
+    video_stream.fps = utils.fraction_str_to_float(meta_data['r_frame_rate'])
+    video_stream.num_frames = int(meta_data['nb_frames'])
+
+    # Try to set timecode for start of recording from either meta data or detected QR.
+    if 'timecode' not in meta_data['tags']:
+        frame_nr, found_timecode = utils.get_timecode_QR(video_stream.file_path, mirrored=video_stream.mirrored)
+
+        if frame_nr is None and found_timecode is None:
+            print("ERROR: Could not configure VideoStream data from file")
+            return jsonify({'error': 'Error while configuring video stream'}), 500
+
+        data_stream.start_timecode = found_timecode - timedelta(seconds=(frame_nr * (1 / video_stream.fps)))
+
+    else:
+        data_stream.start_timecode = datetime.strptime(meta_data['tags']['timecode'], TC_FORMAT)
+
+    data_stream.start_index = utils.timecode_to_index(data_stream.start_timecode)
+    data_stream.end_index = int(data_stream.start_index + (video_stream.num_frames * (60 / video_stream.fps)))
+
+    return '', 200
+
+
+@app.route("/project/<project_id>/<data_stream_id>/sync_data_stream", methods=['POST'])
+def API_sync_data_stream(project_id, data_stream_id):
+    """"""
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    project = Project.query.get(project_id)
+
+    if project is None:
+        return jsonify({'error': 'Project not found'}), 404
+
+    data_stream = DataStream.query.get(data_stream_id)
+
+    if data_stream is None:
+        return jsonify({'error': 'DataStream not found'}), 404
+
+    resp, code = set_meta_data(data_stream)
+
+    if code != 200:
+        return resp, code
+
+    if project.start_index is None or data_stream.start_index < project.start_index:
+        project.start_index = data_stream.start_index
+
+    return jsonify(project.data_streams), 200
 
 
 @app.route("/project/<project_id>/add_data_stream", methods=['POST'])
@@ -212,6 +246,5 @@ def API_add_data_stream(project_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # db.drop_all()
-        # populate_db()
+
     app.run(debug=True)
