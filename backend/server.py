@@ -17,7 +17,6 @@ server_session = Session(app)
 db.init_app(app)
 
 
-
 def get_current_user() -> User:
     """"""
 
@@ -58,6 +57,7 @@ def API_register_user() -> dict:
 
     hashed_password = bcrypt.generate_password_hash(password)
     new_user = User(email=email, password=hashed_password)
+
     db.session.add(new_user)
     db.session.commit()
 
@@ -95,7 +95,7 @@ def populate_db() -> None:
 
 
 @app.route("/project/<name>/add", methods=['POST'])
-def create_new_project(name):
+def API_add_new_project(name):
     """"""
 
     user_id = session.get('user_id')
@@ -116,6 +116,97 @@ def create_new_project(name):
     else:
         app.logger.debug('No projects found')
         return '', 204
+
+
+# def sync_data_stream():
+#     def sync(self) -> Tuple[int, datetime, int, int]:
+#         """
+#         Function for configuring meta data for a VideoStream object.
+#         Makes use of meta data extracted from the video file
+#         using the ffmpeg library. When no timecode is found in the meta data
+#         it tries to detect a QR code in the set of frames.
+
+#         Tries to set the following variables:
+#             - fps
+
+#         It returns the following variables to set the parent DataStream object:
+#             - num_frames
+#             - start_timecode
+#             - start_index
+#             - end_index
+#         """
+
+#         # Meta data about the video file are extracted.
+#         meta_data = ffmpeg.probe(self.file_path)["streams"][0]
+#         self.fps = utils.fraction_str_to_float(meta_data['r_frame_rate'])
+#         num_frames = int(meta_data['nb_frames'])
+
+#         # Try to set timecode for start of recording from either meta data or detected QR.
+#         if 'timecode' not in meta_data['tags']:
+#             frame_nr, found_timecode = utils.get_timecode(self.file_path, mirrored=self.mirrored)
+
+#             if frame_nr is None and found_timecode is None:
+#                 print("ERROR: Could not configure VideoStream data from file")
+#                 return None, None, None
+
+#             start_timecode = found_timecode - timedelta(seconds=(frame_nr * (1 / self.fps)))
+
+#         else:
+#             start_timecode = datetime.strptime(meta_data['tags']['timecode'], TC_FORMAT)
+
+#         start_index = utils.timecode_to_index(start_timecode)
+#         end_index = int( start_index + (num_frames * (60 / self.fps)) )
+
+#         return num_frames, start_timecode, start_index, end_index
+
+
+@app.route("/project/<project_id>/<data_stream_id>/add_video_stream", methods=['POST'])
+def API_add_video_stream(project_id, data_stream_id):
+    """"""
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    project = Project.query.get(project_id)
+
+    if project is None:
+        return jsonify({'error': 'Project not found'}), 404
+
+    data_stream = DataStream.query.get(data_stream_id)
+
+    if data_stream is None:
+        return jsonify({'error': 'DataStream not found'}), 404
+
+
+    video_file_path = request.json['video_file_path']
+    video_stream = VideoStream(file_path=video_file_path)
+
+    data_stream.video_stream = video_stream
+
+    return jsonify(data_stream.video_stream), 200
+
+
+@app.route("/project/<project_id>/add_data_stream", methods=['POST'])
+def API_add_data_stream(project_id):
+    """"""
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    project = Project.query.get(project_id)
+
+    if project is None:
+        return jsonify({'error': 'Project not found'}), 404
+
+    data_stream = DataStream(name="default")
+    project.data_streams.append(data_stream)
+    db.session.commit()
+
+    return jsonify(project.data_streams), 200
 
 
 if __name__ == '__main__':
