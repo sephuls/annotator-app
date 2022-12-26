@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/LandingPage"
 import UserHomePage from "./pages/UserHomePage"
+import ProjectPage from "./pages/ProjectPage"
 import LoginPage from "./pages/LoginPage"
 import RegisterPage from "./pages/RegisterPage"
 import { useState } from "react"
@@ -10,6 +11,8 @@ import httpClient from "./httpClient"
 
 const Router = () => {
     const [user, setUser] = useState(null);
+    const [projectId, setProjectId] = useState(9);
+
 
     useEffect(() => {
         (async () => {
@@ -26,7 +29,8 @@ const Router = () => {
         <BrowserRouter>
             <Routes>
                 {user != null ? (
-                    <Route path="/" element={<UserHomePage/>} />
+                    <Route path="/" element={<ProjectPage projectId={projectId}/>} />
+                    // <Route path="/" element={<UserHomePage/>} />
                 ) : (
                     <Route path="/" element={<LandingPage/>} />
                 )}

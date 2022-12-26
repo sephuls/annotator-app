@@ -10,11 +10,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 html, body, #root {
     margin: 0;
     height: 100%;
-    font-family: sans-serif;
-    font-weight: bolder;
+    /* font-family: sans-serif; */
+    /* font-weight: bolder; */
 }
 
-.app {
+.page {
     display: grid;
     grid-template-rows: 75px auto;
     height: 100%
@@ -23,18 +23,72 @@ html, body, #root {
 /* Header styles */
 .header {
     grid-row: 1;
-    background-color: #607EAA;
+    background-color: #C5C5C5;
 }
 
 h1.header {
     margin: 0;
-    color: white;
-    font-style: italic;
+    /* font-style: italic; */
     font-size: 35px;
 }
 
 /* Content styles */
 
 .content {
+    grid-row: 2;
+}
 
+.timeline-footer {
+    position: absolute;
+    bottom: 0;
+    height: 325px;
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 300px auto;
+}
+
+.timeline-options {
+    background-color: #B5B5B5;
+    grid-column: 1;
+    border-right: white solid 1px;
+}
+
+.timeline-options-header {
+    height: 65px;
+    border-bottom: white solid 1px;
+}
+
+.timeline-options-row {
+    height: 130px;
+    border-bottom: white solid 1px;
+}
+
+.timeline {
+    background-color: #C5C5C5;
+    grid-column: 2;
+}
+
+.timeline-header {
+    height: 65px;
+    border-bottom: #00B2A4 solid 3px;
+}
+
+.timeline-row {
+    height: 65px;
+    border-bottom: white solid 1px;
+}
+
+
+
+.data-stream {
+    position: relative;
+    background-color: #F69D33;
+    border-radius: 5px;
+
+    top: 3px;
+    height: 59px;
+    -moz-box-shadow: inset 0 -10px 10px -10px #000000;
+    -webkit-box-shadow: inset 0 -10px 10px -10px #000000;
+    box-shadow: inset 0 -10px 10px -10px #000000;
 }

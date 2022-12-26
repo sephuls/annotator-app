@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
+import { Timeline } from '../components/Timeline';
 import httpClient from "../httpClient"
 
-export const Content = () => {
-    const [projects, setProjects] = useState([])
+
+export function Project({projectId}) {
+    const [project, setProject] = useState({});
 
     useEffect(() => {
         (async () => {
             try {
-                const resp = await httpClient.get('http://localhost:3000/projects');
+                const resp = await httpClient.post(`http://localhost:5000/project/${projectId}`);
                 if (resp.status !== 204) {
-                    setProjects(resp.data);
+                    setProject(resp.data);
                     console.log(resp.data);
                 } else {
-                    console.log('No projects found');
+                    console.log('Project not found');
                 }
             } catch (error) {
                 console.log("Not authenticated");
@@ -22,9 +24,9 @@ export const Content = () => {
 
     return (
         <div className="content">
-            {projects.map(project => (
-                <li key={project.id}></li>
-            ))}
+            <h1>ProjectPage</h1>
+            Current project: {JSON.stringify(project)}
+            <Timeline projectId={projectId}/>
         </div>
     );
 }
