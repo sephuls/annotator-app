@@ -38,57 +38,77 @@ h1.header {
     grid-row: 2;
 }
 
-.timeline-footer {
+.video-player {
+    position: absolute;
+    right: 400px;
+}
+
+.timeline {
     position: absolute;
     bottom: 0;
     height: 325px;
     width: 100%;
-
-    display: grid;
-    grid-template-columns: 300px auto;
-}
-
-.timeline-options {
-    background-color: #B5B5B5;
-    grid-column: 1;
-    border-right: white solid 1px;
-}
-
-.timeline-options-header {
-    height: 65px;
-    border-bottom: white solid 1px;
-}
-
-.timeline-options-row {
-    height: 130px;
-    border-bottom: white solid 1px;
-}
-
-.timeline {
     background-color: #C5C5C5;
-    grid-column: 2;
+}
+
+.time-cursor {
+    border-left: 2px solid red;
+    height: 325px;
+    position: absolute;
+    left: 50%;
+    z-index: 1;
 }
 
 .timeline-header {
-    height: 65px;
+    position: relative;
+    height: 37.5px;
     border-bottom: #00B2A4 solid 3px;
+    /* background: linear-gradient(to right, black 1px, transparent 1px);
+    background-size: 6px; */
+}
+
+.ticks {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    height: 6px;
+    width: 1200px;
+    background:
+     repeating-linear-gradient(to right, red   0 1px, transparent 2px 50px),
+     repeating-linear-gradient(to right, black 0 1px, transparent 2px 10px);
+
+  }
+
+.timeline-content {
+    overflow: auto;
+    height: 287.5px;
 }
 
 .timeline-row {
-    height: 65px;
+    height: 37.5px;
+    display: grid;
+    grid-template-columns: auto 1200px;
     border-bottom: white solid 1px;
 }
 
+.timeline-row-data {
+    width: inherit;
+}
 
+.timeline-row-options {
+    grid-column: 1;
+    background-color: #B5B5B5;
+    border-right: white solid 1px;
+}
 
-.data-stream {
+.video-stream {
     position: relative;
     background-color: #F69D33;
-    border-radius: 5px;
+    border-radius: 3px;
+}
 
-    top: 3px;
-    height: 59px;
-    -moz-box-shadow: inset 0 -10px 10px -10px #000000;
-    -webkit-box-shadow: inset 0 -10px 10px -10px #000000;
-    box-shadow: inset 0 -10px 10px -10px #000000;
+.mocap-stream {
+    position: relative;
+    background-color: #76bd91;
+    border-radius: 3px;
 }

@@ -3,15 +3,14 @@ import { DataStream } from './DataStream';
 import httpClient from "../httpClient"
 
 
-export const Timeline = ({projectId}) => {
+export const Timeline = ({projectId, startIndex, endIndex}) => {
     const [dataStreams, setDataStreams] = useState([]);
-    const minRows = 3;
-    var emptyRows = Math.floor((minRows - dataStreams.length) / 2)
+    const numRows = 14;
 
     useEffect(() => {
         (async () => {
             try {
-                const resp = await httpClient.post(`http://localhost:5000/project/${projectId}/data_streams`);
+                const resp = await httpClient.get(`http://localhost:5000/data_streams/${projectId}`);
                 if (resp.status !== 204) {
                     setDataStreams(resp.data);
                     console.log(resp.data);
@@ -25,42 +24,20 @@ export const Timeline = ({projectId}) => {
     }, []);
 
     return (
-        <div className="timeline-footer">
-            <div className="timeline-options">
-                <div className='timeline-options-header'>
-
-                </div>
-                {/* {dataStreams.map((dataStream) => (
-                    <div className='timeline-editor-row'>
-                        <div className='data-stream' key={dataStream.id}>
-                            {dataStream.id}
-                        </div>
-                    </div>
-                ))} */}
-                {emptyRows > 0 ? (Array(emptyRows).fill(0).map((row, index) => (
-                    <div key={index} className='timeline-options-row'>
-
-                    </div>
-                ))) : ("")}
+        <div className="timeline">
+            <div className="time-cursor"></div>
+            <div className='timeline-header'>
+                <div className='ticks'></div>
             </div>
-            <div className="timeline">
-                <div className='timeline-header'></div>
-
-                {dataStreams.map((dataStream) => (
-                    <div>
-                        <div key={dataStream.id} className='timeline-row'>
-                            <DataStream dataStream={dataStream}/>
-                        </div>
-                        <div key={dataStream.id} className='timeline-row'>
-                            <DataStream dataStream={dataStream}/>
+            <div className='timeline-content'>
+                {Array(numRows).fill(0).map((_, index) => (
+                    <div key={index} className='timeline-row'>
+                        <div className='timeline-row-options'></div>
+                        <div className='timeline-row-data'>
+                            {index < dataStreams.length ? <DataStream dataStream={dataStreams[index]} startIndex={startIndex} endIndex={endIndex}/> : null}
                         </div>
                     </div>
                 ))}
-                {emptyRows > 0 ? (Array(emptyRows).fill(0).map((row, index) => (
-                    <div key={index} className='timeline-row'>
-
-                    </div>
-                ))) : ("")}
             </div>
         </div>
     )

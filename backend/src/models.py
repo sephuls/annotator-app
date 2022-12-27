@@ -88,8 +88,8 @@ class DataStream(db.Model):
     start_index: int = db.Column(db.Integer, nullable=True)
     end_index: int = db.Column(db.Integer, nullable=True)
 
-    video_stream = db.relationship('VideoStream', uselist=False, backref='data_stream')
-    mocap_stream = db.relationship('MoCapStream', uselist=False, backref='data_stream')
+    video_stream: VideoStream = db.relationship('VideoStream', uselist=False, backref='data_stream')
+    mocap_stream: MoCapStream = db.relationship('MoCapStream', uselist=False, backref='data_stream')
 
 
 @dataclass
@@ -101,6 +101,7 @@ class Project(db.Model):
     id: int  = db.Column('id', db.Integer, primary_key=True)
     name: str = db.Column(db.String(100), nullable=False)
     start_index: int = db.Column(db.Integer, nullable=True)
+    end_index: int = db.Column(db.Integer, nullable=True)
     user_id: str = db.Column(db.String, db.ForeignKey('user.id'))
     data_streams: list = db.relationship('DataStream', backref='project')
     annotation_streams: list = db.relationship('AnnotationStream', backref='project')

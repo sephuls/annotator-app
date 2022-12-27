@@ -84,6 +84,7 @@ def API_login_user() -> dict:
     }), 200
 
 
+
 #######################################################################################################
 
 
@@ -140,6 +141,27 @@ def API_get_project(project_id):
         return jsonify({'error': 'Unauthorized'}), 401
 
     return jsonify(project), 200
+
+
+@app.route('/project/<project_id>', methods=['DELETE'])
+def API_delete_project(project_id):
+    """"""
+
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Unauthorized'}), 401
+    user = User.query.filter_by(id=user_id).first()
+    project = Project.query.get(project_id)
+    if project is None:
+        return jsonify({'error': 'Project not found'}), 404
+    if project not in user.projects:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    db.session.delete(project)
+    db.session.commit()
+
+    return jsonify(user.projects), 200
+
 
 
 #######################################################################################################
@@ -263,7 +285,6 @@ def API_delete_mocap_stream(project_id, data_stream_id, mocap_stream_id):
 
 
 
-
 @app.route("/data_streams/<project_id>/<data_stream_id>/sync", methods=['PATCH'])
 def API_sync_data_stream(project_id, data_stream_id):
     """"""
@@ -284,6 +305,9 @@ def API_sync_data_stream(project_id, data_stream_id):
 
     if project.start_index is None or data_stream.start_index < project.start_index:
         project.start_index = data_stream.start_index
+
+    if project.end_index is None or data_stream.end_index > project.end_index:
+        project.end_index = data_stream.end_index
 
     db.session.commit()
 
@@ -335,7 +359,6 @@ def API_get_data_streams(project_id):
 
     user = User.query.filter_by(id=user_id).first()
     project = Project.query.get(project_id)
-
 
     # if project not in user.projects:
     #     return jsonify({'error': 'Unauthorized'}), 401
