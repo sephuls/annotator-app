@@ -469,7 +469,7 @@ def API_get_annotations(project_id, annotation_stream_id):
     if annotation_stream is None:
         return jsonify({'error': 'AnnotationStream not found'}), 404
 
-    return jsonify(project.annotation_stream.annotations), 200
+    return jsonify(annotation_stream.annotations), 200
 
 
 @app.route("/annotations/<project_id>/<annotation_stream_id>/<annotation_id>", methods=['DELETE'])

@@ -38,9 +38,13 @@ h1.header {
     grid-row: 2;
 }
 
+.input-fields {
+    width: 50%;
+}
+
 .video-player {
     position: absolute;
-    right: 400px;
+    right: 0px;
 }
 
 .timeline {
@@ -55,7 +59,7 @@ h1.header {
     border-left: 2px solid red;
     height: 325px;
     position: absolute;
-    left: 50%;
+    left: 0%;
     z-index: 1;
 }
 

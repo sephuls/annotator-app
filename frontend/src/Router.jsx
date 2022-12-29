@@ -11,8 +11,6 @@ import httpClient from "./httpClient"
 
 const Router = () => {
     const [user, setUser] = useState(null);
-    const [projectId, setProjectId] = useState(1);
-
 
     useEffect(() => {
         (async () => {
@@ -29,7 +27,8 @@ const Router = () => {
         <BrowserRouter>
             <Routes>
                 {user != null ? (
-                    <Route path="/" element={<ProjectPage projectId={projectId}/>} />
+                    <Route path="/" element={<ProjectPage />} />
+
                     // <Route path="/" element={<UserHomePage/>} />
                 ) : (
                     <Route path="/" element={<LandingPage/>} />
