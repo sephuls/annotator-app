@@ -26,13 +26,13 @@ const Router = () => {
     return (
         <BrowserRouter>
             <Routes>
-                {user != null ? (
+                {user != null ?
                     <Route path="/" element={<ProjectPage />} />
 
                     // <Route path="/" element={<UserHomePage/>} />
-                ) : (
+                 :
                     <Route path="/" element={<LandingPage/>} />
-                )}
+                }
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
             </Routes>

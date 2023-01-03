@@ -49,11 +49,12 @@ class VideoStream(db.Model):
     __tablename__ = 'video_stream'
 
     id: int = db.Column('id', db.Integer, primary_key=True)
-    file_path: str = db.Column(db.String(100), nullable=False)
     fps: float = db.Column(db.Float, nullable=True)
     num_frames: int = db.Column(db.Integer, nullable=True)
     mirrored: bool = db.Column(db.Boolean, nullable=False)
+    file_path: str = db.Column(db.String(100), nullable=False)
     data_stream_id: str = db.Column(db.Integer, db.ForeignKey('data_stream.id'))
+
 
 
 @dataclass

@@ -5,6 +5,12 @@ from datetime import datetime, timedelta
 
 
 TC_FORMAT = "%H:%M:%S:%f"
+ALLOWED_EXTENSIONS = {'mov', 'csv', 'xlsx', 'mp4'}
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def timecode_to_index(timecode: datetime, microseconds: bool = False) -> int:

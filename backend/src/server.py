@@ -1,16 +1,17 @@
 import utils
+from os.path import join
 import pandas as pd
 from flask import Flask, request, jsonify, session
 from flask_bcrypt import Bcrypt
 from flask_session import Session
 from flask_cors import CORS
 from config import Config
+from werkzeug.utils import secure_filename
 from models import User, Project, DataStream, VideoStream, MoCapStream, AnnotationStream, Annotation, db
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 app.config.from_object(Config)
-
 bcrypt = Bcrypt(app)
 cors = CORS(app, supports_credentials=True)
 server_session = Session(app)
@@ -182,8 +183,15 @@ def API_create_video_stream(project_id, data_stream_id):
     if data_stream is None:
         return jsonify({'error': 'DataStream not found'}), 404
 
-    video_file_path = request.json['video_file_path']
-    video_stream = VideoStream(file_path=video_file_path, mirrored=False)
+    file = request.files['file']
+
+    if not file or not utils.allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed'}), 400
+
+    file_path = join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
+    file.save(file_path)
+
+    video_stream = VideoStream(file_path=file_path, mirrored=False)
     data_stream.video_stream = video_stream
     db.session.commit()
 
@@ -247,10 +255,14 @@ def API_create_mocap_stream(project_id, data_stream_id):
     data_stream = DataStream.query.get(data_stream_id)
     if data_stream is None:
         return jsonify({'error': 'DataStream not found'}), 404
+    file = request.files['file']
+    if not file or not utils.allowed_file(file.filename):
+        return jsonify({'error': 'File type not allowed'}), 400
 
-    mocap_file_path = request.json['mocap_file_path']
-    source = request.json['source']
-    mocap_stream = MoCapStream(file_path=mocap_file_path, source=source)
+    file_path = join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
+    file.save(file_path)
+    source = request.form['source']
+    mocap_stream = MoCapStream(file_path=file_path, source=source)
     data_stream.mocap_stream = mocap_stream
     db.session.commit()
 
