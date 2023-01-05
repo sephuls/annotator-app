@@ -193,6 +193,7 @@ def API_create_video_stream(project_id, data_stream_id):
 
     video_stream = VideoStream(file_path=file_path, mirrored=False)
     data_stream.video_stream = video_stream
+
     db.session.commit()
 
     return jsonify(data_stream.video_stream), 200
@@ -217,21 +218,23 @@ def API_get_video_stream(project_id, data_stream_id):
     return jsonify(data_stream.video_stream), 200
 
 
-@app.route("/video_streams/<project_id>/<data_stream_id>", methods=['DELETE'])
-def API_delete_video_stream(project_id, data_stream_id):
+@app.route("/video_streams/<data_stream_id>", methods=['DELETE'])
+def API_delete_video_stream(data_stream_id):
     """"""
 
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
-    project = Project.query.get(project_id)
-    if project is None:
-        return jsonify({'error': 'Project not found'}), 404
     data_stream = DataStream.query.get(data_stream_id)
     if data_stream is None:
         return jsonify({'error': 'DataStream not found'}), 404
     if data_stream.video_stream is None:
         return jsonify({'error': 'VideoStream not found'}), 404
+
+    # Undo synchronisation of data stream.
+    data_stream.start_timecode = None
+    data_stream.start_index = 0
+    data_stream.end_index = 0
 
     db.session.delete(data_stream.video_stream)
     db.session.commit()
@@ -269,27 +272,24 @@ def API_create_mocap_stream(project_id, data_stream_id):
     return jsonify(data_stream.mocap_stream), 200
 
 
-@app.route("/mocap_streams/<project_id>/<data_stream_id>/<mocap_stream_id>", methods=['DELETE'])
-def API_delete_mocap_stream(project_id, data_stream_id, mocap_stream_id):
+@app.route("/mocap_streams/<data_stream_id>", methods=['DELETE'])
+def API_delete_mocap_stream(data_stream_id):
     """"""
 
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
-    project = Project.query.get(project_id)
-    if project is None:
-        return jsonify({'error': 'Project not found'}), 404
     data_stream = DataStream.query.get(data_stream_id)
     if data_stream is None:
         return jsonify({'error': 'DataStream not found'}), 404
-    mocap_stream = MoCapStream.query.get(mocap_stream_id)
+    mocap_stream = data_stream.mocap_stream
     if mocap_stream is None:
         return jsonify({'error': 'MoCapStream not found'}), 404
 
     db.session.delete(mocap_stream)
     db.session.commit()
 
-    return jsonify(project.data_streams), 200
+    return jsonify(data_stream), 200
 
 
 
@@ -418,16 +418,13 @@ def API_get_annotation_streams(project_id):
     return jsonify(project.annotation_streams), 200
 
 
-@app.route("/annotation_streams/<project_id>/<annotation_stream_id>", methods=['DELETE'])
-def API_delete_annotation_streams(project_id, annotation_stream_id):
+@app.route("/annotation_streams/<annotation_stream_id>", methods=['DELETE'])
+def API_delete_annotation_streams(annotation_stream_id):
     """"""
 
     user_id = session.get('user_id')
     if not user_id:
         return jsonify({'error': 'Unauthorized'}), 401
-    project = Project.query.get(project_id)
-    if project is None:
-        return jsonify({'error': 'Project not found'}), 404
     annotation_stream = AnnotationStream.query.get(annotation_stream_id)
     if annotation_stream is None:
         return jsonify({'error': 'AnnotationStream not found'}), 404
@@ -435,7 +432,7 @@ def API_delete_annotation_streams(project_id, annotation_stream_id):
     db.session.delete(annotation_stream)
     db.session.commit()
 
-    return jsonify(project.annotation_streams), 200
+    return jsonify(annotation_stream), 200
 
 
 

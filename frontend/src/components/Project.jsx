@@ -113,30 +113,36 @@ export function Project() {
 
     return (
         <div className="content">
-            <div className='video-player'>
-                <ReactPlayer
-                    ref={playerRef}
-                    url={videoFilePath}
-                    controls={true}
-                    onSeek={handleSeekChange}
-                    onDuration={handleDuration}
-                    onProgress={handleProgress}
-                />
-            </div>
+            <div className='display'>
+                <div className='display-side-left'>
+                    <input type="file" onChange={handleVideoUpload} />
+                        <form onSubmit={handleSubmitAnnotation}>
+                            <input
+                                type="text"
+                                value={newAnnotation.label}
+                                onChange={(e) => {setNewAnnotation({...newAnnotation, label: e.target.value})}}
+                            />
+                            <p>From: {newAnnotation.from} To: {newAnnotation.to}</p>
+                            <input type='submit'></input>
+                        </form>
+                        <p>Played: {playerState.played} Duration: {playerState.duration} Position: {playerState.cursorPosition.x}</p>
+                        Annotations: {annotations.map((a, index) => (<div key={index} >{JSON.stringify(a)}</div>))}
+                </div>
 
-            <div className='input-fields'>
-                <input type="file" onChange={handleVideoUpload} />
-                    <form onSubmit={handleSubmitAnnotation}>
-                        <input
-                            type="text"
-                            value={newAnnotation.label}
-                            onChange={(e) => {setNewAnnotation({...newAnnotation, label: e.target.value})}}
-                        />
-                        <p>From: {newAnnotation.from} To: {newAnnotation.to}</p>
-                        <input type='submit'></input>
-                    </form>
-                    <p>Played: {playerState.played} Duration: {playerState.duration} Position: {playerState.cursorPosition.x}</p>
-                    Annotations: {annotations.map((a, index) => (<div key={index} >{JSON.stringify(a)}</div>))}
+                <div className='video-player'>
+                    <ReactPlayer
+                        ref={playerRef}
+                        url={videoFilePath}
+                        controls={true}
+                        onSeek={handleSeekChange}
+                        onDuration={handleDuration}
+                        onProgress={handleProgress}
+                    />
+                </div>
+
+                <div className='display-side-right'></div>
+
+
             </div>
 
             <Timeline
