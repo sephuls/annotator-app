@@ -87,6 +87,7 @@ h1.header {
     position: relative;
     height: 40px;
 
+    width: 100%;
     display: grid;
     grid-template-columns: 394px auto;
     border-bottom: white solid 3px;
@@ -115,13 +116,13 @@ h1.header {
 
 .timeline-row {
     height: 40px;
+    width: 100%;
     display: grid;
     grid-template-columns: 394px auto;
     border-bottom: white solid 1px;
 }
 
 .timeline-row-data {
-    width: inherit;
 }
 
 .timeline-row-options {
