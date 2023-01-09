@@ -9,22 +9,13 @@ export function Project() {
     const [playerState, setPlayerState] = useState({
         played: 0,
         duration: 0,
-        cursorPosition: {x: 0, y: 0}
+        cursorPosition: {x: 394, y: 0}
     });
 
     const [projectId, setProjectId] = useState(1);
     const [project, setProject] = useState({});
 
     const [videoFilePath, setVideoFilePath] = useState(null);
-
-    const annotationStreamId = 1;
-    const [annotations, setAnnotations] = useState([]);
-    const [newAnnotation, setNewAnnotation] = useState({
-        fromSet: false,
-        from: 0,
-        to: 0,
-        label: ''
-    })
 
     const handleVideoUpload = (event) => {
         setVideoFilePath(URL.createObjectURL(event.target.files[0]));
@@ -64,36 +55,16 @@ export function Project() {
         })
     }
 
-    const handleSubmitAnnotation = (e) => {
-        e.preventDefault();
-        if (newAnnotation.fromSet) {
-            setAnnotations(annotations => [...annotations, {
-                from: newAnnotation.from,
-                label: newAnnotation.label,
-                to: playerState.played,
-            }]);
-
-            const resp = httpClient.post(
-                `http://localhost:5000/annotations/${projectId}/${annotationStreamId}`,
-                {
-                    "label": newAnnotation.label,
-                    "start_index": newAnnotation.from,
-                    "end_index": playerState.played
-                })
-            setNewAnnotation({
-                fromSet: false,
-                from: 0,
-                to: 0,
-                label: ''
-            });
-        } else {
-            setNewAnnotation({
-                ...newAnnotation,
-                fromSet: true,
-                from: playerState.played,
-            });
+    const handleExport = async (e) => {
+        try {
+            httpClient.delete(`http://localhost:5000/`)
+            .then(resp => {
+                window.location.reload(false);
+            })
+        } catch (ex) {
+            console.log(ex);
         }
-    }
+    };
 
     useEffect(() => {
         (async () => {
@@ -116,17 +87,7 @@ export function Project() {
             <div className='display'>
                 <div className='display-side-left'>
                     <input type="file" onChange={handleVideoUpload} />
-                        <form onSubmit={handleSubmitAnnotation}>
-                            <input
-                                type="text"
-                                value={newAnnotation.label}
-                                onChange={(e) => {setNewAnnotation({...newAnnotation, label: e.target.value})}}
-                            />
-                            <p>From: {newAnnotation.from} To: {newAnnotation.to}</p>
-                            <input type='submit'></input>
-                        </form>
                         <p>Played: {playerState.played} Duration: {playerState.duration} Position: {playerState.cursorPosition.x}</p>
-                        Annotations: {annotations.map((a, index) => (<div key={index} >{JSON.stringify(a)}</div>))}
                 </div>
 
                 <div className='video-player'>

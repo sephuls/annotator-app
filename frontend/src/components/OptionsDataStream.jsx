@@ -77,7 +77,7 @@ export function OptionsDataStream(props) {
             }
 
             {props.dataStream.mocap_stream !== null
-            ? <button onClick={(e) => {handleMoCapStreamDelete(e, props.dataStream.id)}}>Delete Mocap Stream</button>
+            ? <button onClick={(e) => {handleMoCapStreamDelete(e, props.dataStream.id)}}>Delete MoCap Stream</button>
             : <UploadButton
                     dataStreamId={props.dataStream.id}
                     name='MoCap Stream'

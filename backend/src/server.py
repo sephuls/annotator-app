@@ -25,7 +25,10 @@ db.init_app(app)
 
 @app.route('/@me', methods=['GET'])
 def API_get_current_user() -> dict:
-    """"""
+    """
+    Server-side function for reading the current user
+    using the user_id set as a session token.
+    """
 
     user_id = session.get('user_id')
 
@@ -519,10 +522,11 @@ def in_stream_range(anno_start, anno_end, data_start, data_end):
 def mocap_data_to_df(data_stream):
     df = pd.read_csv(data_stream.mocap_stream.file_path)
     df.index += data_stream.start_index
+    # TODO: fps
     return df
 
 
-@app.route("/data/<project_id>", methods=['GET'])
+@app.route("/export/<project_id>", methods=['GET'])
 def API_export_data(project_id):
     """"""
 
@@ -534,15 +538,26 @@ def API_export_data(project_id):
         return jsonify({'error': 'Project not found'}), 404
 
     data = jsonify(project).get_json()
-    mocap_data = [mocap_data_to_df(ds) for ds in project.data_streams]
+    mocap_dfs = [mocap_data_to_df(ds) for ds in project.data_streams if ds.mocap_stream is not None]
 
-    print(jsonify(project.data_streams[0].mocap_stream).get_json())
-    print(mocap_data)
+    non_empty_annotation_streams = [an_str for an_str in data['annotation_streams'] if len(an_str['annotations']) > 0]
 
-    # for anno_streams in data['annotation_streams']:
-    #     for annos in anno_streams['annotations']:
-    #         for anno in annos:
+    annotations_df = pd.DataFrame.from_records(non_empty_annotation_streams).explode(column='annotations')
+    annotations_df = pd.concat([annotations_df, annotations_df['annotations'].apply(pd.Series)], axis=1).drop(columns=['annotations'])
 
+    export = []
+    # print(export_df)
+    for _, annotation in annotations_df.iterrows():
+        annotation_set = annotation.to_dict()
+
+        sliced_dfs = [mdf.loc[int(annotation.start_index):int(annotation.end_index)] for mdf in mocap_dfs]
+        # print(sliced_dfs[0].to_json(orient='records'))
+
+        for
+        annotation_set['mocap_data'] = sliced_dfs[0].to_dict(orient='records')
+        export.append(annotation_set)
+
+    print(export)
 
     return jsonify(data), 200
 

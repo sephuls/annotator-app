@@ -3,8 +3,8 @@ import { VideoStream } from "./VideoStream";
 
 
 export function DataStream({dataStream, startIndex, endIndex}) {
-    const start = ((dataStream.start_index - startIndex) / (endIndex - startIndex)) * 1200;
-    const width = ((dataStream.end_index - dataStream.start_index) / (endIndex - startIndex)) * 1200;
+    const start = ((dataStream.start_index - startIndex) / (endIndex - startIndex)) * 1040;
+    const width = ((dataStream.end_index - dataStream.start_index) / (endIndex - startIndex)) * 1040;
 
     function renderStreams() {
         if (dataStream.video_stream !== null && dataStream.mocap_stream !== null) {

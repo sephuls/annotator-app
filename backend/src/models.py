@@ -37,7 +37,10 @@ class AnnotationStream(db.Model):
     id: int = db.Column('id', db.Integer, primary_key=True)
     project_id: str = db.Column(db.Integer, db.ForeignKey('project.id'))
     name: str = db.Column(db.String(100), nullable=True)
-    annotations: list = db.relationship('Annotation', backref='annotation_stream.id')
+    annotations: list = db.relationship(
+        'Annotation',
+        backref='annotation_stream.id',
+        cascade="all, delete, delete-orphan" )
 
 
 @dataclass

@@ -56,6 +56,9 @@ export const Timeline = (props) => {
             return <RowAnnotationStream
                         projectId={props.projectId}
                         annotationStream={annotationStreams[index-dataStreams.length]}
+                        startIndex={props.startIndex}
+                        endIndex={props.endIndex}
+                        cursorPosition={props.cursorPosition}
                         key={index}
                     />;
         } else {
