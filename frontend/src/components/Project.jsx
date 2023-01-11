@@ -57,13 +57,17 @@ export function Project() {
 
     const handleExport = async (e) => {
         try {
-            httpClient.delete(`http://localhost:5000/`)
+            httpClient.get(`http://localhost:5000/export/${projectId}`)
             .then(resp => {
                 window.location.reload(false);
             })
         } catch (ex) {
             console.log(ex);
         }
+    };
+
+    const handleDisplay = async (e, videoStream) => {
+        setVideoFilePath(videoStream.file_path);
     };
 
     useEffect(() => {
@@ -88,6 +92,7 @@ export function Project() {
                 <div className='display-side-left'>
                     <input type="file" onChange={handleVideoUpload} />
                         <p>Played: {playerState.played} Duration: {playerState.duration} Position: {playerState.cursorPosition.x}</p>
+                        <button onClick={handleExport}>Export</button>
                 </div>
 
                 <div className='video-player'>
@@ -112,6 +117,7 @@ export function Project() {
                 endIndex={project.end_index}
                 cursorPosition={playerState.cursorPosition}
                 handleCursorChange={handleCursorChange}
+                handleDisplay={handleDisplay}
             />
         </div>
     );

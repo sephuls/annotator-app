@@ -1,4 +1,5 @@
 import utils
+import json
 from os.path import join
 import pandas as pd
 from flask import Flask, request, jsonify, session
@@ -522,6 +523,7 @@ def in_stream_range(anno_start, anno_end, data_start, data_end):
 def mocap_data_to_df(data_stream):
     df = pd.read_csv(data_stream.mocap_stream.file_path)
     df.index += data_stream.start_index
+
     # TODO: fps
     return df
 
@@ -538,26 +540,31 @@ def API_export_data(project_id):
         return jsonify({'error': 'Project not found'}), 404
 
     data = jsonify(project).get_json()
-    mocap_dfs = [mocap_data_to_df(ds) for ds in project.data_streams if ds.mocap_stream is not None]
+    mocap_streams = [{'name': ds.name, 'mocap_data': mocap_data_to_df(ds)} for ds in project.data_streams if ds.mocap_stream is not None]
 
     non_empty_annotation_streams = [an_str for an_str in data['annotation_streams'] if len(an_str['annotations']) > 0]
 
     annotations_df = pd.DataFrame.from_records(non_empty_annotation_streams).explode(column='annotations')
     annotations_df = pd.concat([annotations_df, annotations_df['annotations'].apply(pd.Series)], axis=1).drop(columns=['annotations'])
 
-    export = []
-    # print(export_df)
+    export = {'project_name': project.name, 'annotations': []}
+
+    print(mocap_streams)
+
     for _, annotation in annotations_df.iterrows():
         annotation_set = annotation.to_dict()
+        annotation_set['mocap_streams'] = []
 
-        sliced_dfs = [mdf.loc[int(annotation.start_index):int(annotation.end_index)] for mdf in mocap_dfs]
-        # print(sliced_dfs[0].to_json(orient='records'))
+        for mo_str in mocap_streams:
+            annotation_set['mocap_streams'].append({
+                'name': mo_str['name'],
+                'mocap_data': mo_str['mocap_data'].loc[int(annotation.start_index):int(annotation.end_index)].to_dict(orient='records')
+            })
 
-        for
-        annotation_set['mocap_data'] = sliced_dfs[0].to_dict(orient='records')
-        export.append(annotation_set)
+        export['annotations'].append(annotation_set)
 
-    print(export)
+    with open('test_export.json', 'w') as fp:
+        json.dump(export, fp)
 
     return jsonify(data), 200
 

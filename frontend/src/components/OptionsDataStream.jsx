@@ -85,6 +85,7 @@ export function OptionsDataStream(props) {
                 />
             }
             <button className="button-sync" onClick={(e) => {handleSync(e, props.dataStream.id)}}>Sync</button>
+            <button className="button-sync" onClick={(e) => {props.handleDisplay(e, props.dataStream.video_stream)}}>Display</button>
         </div>
     );
 }

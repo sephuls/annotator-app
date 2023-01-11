@@ -8,6 +8,7 @@ export function RowDataStream(props) {
             <OptionsDataStream
                 projectId={props.projectId}
                 dataStream={props.dataStream}
+                handleDisplay={props.handleDisplay}
             />
             <div className='timeline-row-data'>
                 <DataStream

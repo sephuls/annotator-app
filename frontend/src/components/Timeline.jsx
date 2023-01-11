@@ -51,6 +51,7 @@ export const Timeline = (props) => {
                         startIndex={props.startIndex}
                         endIndex={props.endIndex}
                         key={index}
+                        handleDisplay={props.handleDisplay}
                     />;
         } else if (index < (dataStreams.length + annotationStreams.length)) {
             return <RowAnnotationStream
