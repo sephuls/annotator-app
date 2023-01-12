@@ -21,7 +21,7 @@ export function Project() {
         setVideoFilePath(URL.createObjectURL(event.target.files[0]));
     };
 
-    const handleSeekChange = e => {
+    const handleSeekChange = (e) => {
         setPlayerState({
             ...playerState,
             played: parseFloat(e.target.value),
@@ -67,7 +67,7 @@ export function Project() {
     };
 
     const handleDisplay = async (e, videoStream) => {
-        setVideoFilePath(videoStream.file_path);
+        setVideoFilePath(`../../${videoStream.file_path.slice(22)}`);
     };
 
     useEffect(() => {
@@ -99,6 +99,7 @@ export function Project() {
                     <ReactPlayer
                         ref={playerRef}
                         url={videoFilePath}
+                        // url={'06-V1-declarative-M.mp4'}
                         controls={true}
                         onSeek={handleSeekChange}
                         onDuration={handleDuration}
