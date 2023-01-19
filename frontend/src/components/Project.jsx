@@ -59,7 +59,8 @@ export function Project() {
         try {
             httpClient.get(`http://localhost:5000/export/${projectId}`)
             .then(resp => {
-                window.location.reload(false);
+                // window.location.reload(false);
+                console.log('export', resp.data);
             })
         } catch (ex) {
             console.log(ex);
@@ -92,7 +93,9 @@ export function Project() {
                 <div className='display-side-left'>
                     <input type="file" onChange={handleVideoUpload} />
                         <p>Played: {playerState.played} Duration: {playerState.duration} Position: {playerState.cursorPosition.x}</p>
-                        <button onClick={handleExport}>Export</button>
+                        <form action={`http://localhost:5000/export/${projectId}`}>
+                            <input type="submit" value="Export" />
+                        </form>
                 </div>
 
                 <div className='video-player'>

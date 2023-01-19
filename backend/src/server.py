@@ -1,8 +1,9 @@
 import utils
 import json
+import os
 from os.path import join
 import pandas as pd
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, Response, send_file
 from flask_bcrypt import Bcrypt
 from flask_session import Session
 from flask_cors import CORS
@@ -175,7 +176,10 @@ def API_delete_project(project_id):
 
 @app.route("/video_streams/<project_id>/<data_stream_id>", methods=['POST'])
 def API_create_video_stream(project_id, data_stream_id):
-    """"""
+    """
+    Function that serves as the API endpoint for creating a VideoStream object
+    and storing it in the apps database.
+    """
 
     user_id = session.get('user_id')
     if not user_id:
@@ -194,6 +198,14 @@ def API_create_video_stream(project_id, data_stream_id):
 
     file_path = join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
     file.save(file_path)
+
+
+    # If video file is of MOV format we have to convert it to MP4 format.
+    if file.filename.rsplit('.', 1)[1].lower() == 'mov':
+        file_path_mp4 = file_path.rsplit('.', 1)[0] + '.mp4'
+        os.system(f"ffmpeg -i {file_path} -vcodec h264 -acodec mp2 {file_path_mp4}")
+        os.remove(file_path)
+        file_path = file_path_mp4
 
     video_stream = VideoStream(file_path=file_path, mirrored=False)
     data_stream.video_stream = video_stream
@@ -224,7 +236,11 @@ def API_get_video_stream(project_id, data_stream_id):
 
 @app.route("/video_streams/<data_stream_id>", methods=['DELETE'])
 def API_delete_video_stream(data_stream_id):
-    """"""
+    """
+    Function that serves as the API endpoint for deleting a VideoStream
+    from the apps database. The original video file is also deleted
+    from object storage.
+    """
 
     user_id = session.get('user_id')
     if not user_id:
@@ -240,6 +256,7 @@ def API_delete_video_stream(data_stream_id):
     data_stream.start_index = 0
     data_stream.end_index = 0
 
+    os.remove(data_stream.video_stream.file_path)
     db.session.delete(data_stream.video_stream)
     db.session.commit()
 
@@ -538,6 +555,8 @@ def API_export_data(project_id):
     project = Project.query.get(project_id)
     if project is None:
         return jsonify({'error': 'Project not found'}), 404
+    if project.annotation_streams == []:
+        return jsonify({'error': 'No annotations found'}), 404
 
     data = jsonify(project).get_json()
     mocap_streams = [{'name': ds.name, 'mocap_data': mocap_data_to_df(ds)} for ds in project.data_streams if ds.mocap_stream is not None]
@@ -548,8 +567,6 @@ def API_export_data(project_id):
     annotations_df = pd.concat([annotations_df, annotations_df['annotations'].apply(pd.Series)], axis=1).drop(columns=['annotations'])
 
     export = {'project_name': project.name, 'annotations': []}
-
-    print(mocap_streams)
 
     for _, annotation in annotations_df.iterrows():
         annotation_set = annotation.to_dict()
@@ -563,11 +580,12 @@ def API_export_data(project_id):
 
         export['annotations'].append(annotation_set)
 
-    with open('test_export.json', 'w') as fp:
+    path = app.config['UPLOAD_FOLDER'] + '/export.json'
+
+    with open(path, 'w') as fp:
         json.dump(export, fp)
 
-    return jsonify(data), 200
-
+    return send_file(path, as_attachment=True)
 
 
 if __name__ == '__main__':
