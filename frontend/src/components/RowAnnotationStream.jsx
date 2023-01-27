@@ -18,7 +18,7 @@ export function RowAnnotationStream(props) {
         if(annotationStart) {
             try {
                 httpClient.post(`http://localhost:5000/annotations/${props.projectId}/${props.annotationStream.id}`, {
-                    label: "C",
+                    label: "myLabel",
                     start_index: annotationStart,
                     end_index: posToIndex(props.cursorPosition.x)
                 })

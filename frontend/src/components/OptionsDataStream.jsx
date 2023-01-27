@@ -80,7 +80,7 @@ export function OptionsDataStream(props) {
                     <button
                         style={{'backgroundColor': 'rgba(255, 255, 0, 0.383)'}}
                         className="timeline-row-button"
-                        onClick={(e) => {props.handleDisplay(e, props.dataStream.video_stream)}}
+                        onClick={(e) => {props.handleDisplay(e, props.dataStream)}}
                     >Display</button>
                     <button
                         className="timeline-row-button"

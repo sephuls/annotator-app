@@ -27,8 +27,8 @@ export const RowEmpty = (props) => {
     return  (
         <div className='timeline-row'>
             <div className='timeline-row-options'>
-                <button className="timeline-row-button" onClick={handleDataStreamCreation}>Data Stream</button>
-                <button className="timeline-row-button" onClick={handleAnnotationStreamCreation}>Annotation Stream</button>
+                <button className="timeline-row-button" onClick={handleDataStreamCreation}>Create a Data Stream</button>
+                <button className="timeline-row-button" onClick={handleAnnotationStreamCreation}>Create an Annotation Stream</button>
             </div>
         </div>
     );

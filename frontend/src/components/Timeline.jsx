@@ -78,6 +78,7 @@ export const Timeline = (props) => {
                 <Cursor
                     handleCursorChange={props.handleCursorChange}
                     cursorPosition={props.cursorPosition}
+                    selectedVideoStream={props.selectedVideoStream}
                 />
                 {Array(numRows).fill(0).map((_, index) => (renderStreams(index)))}
             </div>

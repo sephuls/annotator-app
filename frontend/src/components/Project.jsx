@@ -11,6 +11,12 @@ export function Project() {
     const [videoFilePath, setVideoFilePath] = useLocalStorage(
         'videoFilePath', {}
     );
+    const [selectedVideoStream, setSelectedVideoStream] = useLocalStorage(
+        'selectedVideoStream', {
+            'start': 0,
+            'width': 1040
+        }
+    );
     const playerRef = useRef(null);
     const [playerState, setPlayerState] = useLocalStorage(
         'playerState',
@@ -22,27 +28,23 @@ export function Project() {
     );
 
     useEffect(() => {
-        playerRef.current.seekTo((playerState.cursorPosition.x - 394) / 1040)
-    });
-
-    const handleVideoUpload = (event) => {
-        setVideoFilePath(URL.createObjectURL(event.target.files[0]));
-    };
+        playerRef.current.seekTo(playerState.played);
+    }, []);
 
     const handleSeekChange = (e) => {
         setPlayerState({
             ...playerState,
-            // played: parseFloat(e.target.value),
+            played: parseFloat(e),
         })
     }
 
     const handleCursorChange = (e, data) => {
         setPlayerState({
             ...playerState,
-            played: (data.x - 394) * playerState.duration / 1040,
+            played: (data.x - (394 + selectedVideoStream.start)) / selectedVideoStream.width,
             cursorPosition: {x: data.x, y: 0}
         })
-        playerRef.current.seekTo((data.x - 394) / 1040)
+        playerRef.current.seekTo(playerState.played);
     }
 
     const handleDuration = (e) => {
@@ -55,27 +57,20 @@ export function Project() {
     const handleProgress = state => {
         setPlayerState({
             ...playerState,
-            played: parseFloat(state.playedSeconds),
+            played: parseFloat(state.playedSeconds / playerState.duration),
             cursorPosition: {
-                x: 394 + state.played * 1040,
+                x: parseInt(394 + selectedVideoStream.start + (state.playedSeconds / playerState.duration) * selectedVideoStream.width),
                 y: 0
             }
         })
     }
 
-    const handleExport = async (e) => {
-        try {
-            httpClient.get(`http://localhost:5000/export/${projectId}`)
-            .then(resp => {
-                console.log('export', resp.data);
-            })
-        } catch (ex) {
-            console.log(ex);
-        }
-    };
-
-    const handleDisplay = async (e, videoStream) => {
-        setVideoFilePath(`../../${videoStream.file_path.slice(22)}`);
+    const handleDisplay = async (e, dataStream) => {
+        setVideoFilePath(`../../${dataStream.video_stream.file_path.slice(22)}`);
+        setSelectedVideoStream({
+            'start': ((dataStream.start_index - project.start_index) / (project.end_index - project.start_index)) * 1040,
+            'width': ((dataStream.end_index - dataStream.start_index) / (project.end_index - project.start_index)) * 1040
+        });
     };
 
     useEffect(() => {
@@ -98,10 +93,12 @@ export function Project() {
         <div className="content">
             <div className='display'>
                 <div className='display-side-left'>
-
+                    <div className='project-navigation'>
+                        <h2>{'<Project navigation>'}</h2>
+                    </div>
                     <div className='export-form'>
                         <form action={`http://localhost:5000/export/${projectId}`}>
-                            <input type="submit" value="Export" />
+                            <input className='export-button' type="submit" value="Export to JSON" />
                         </form>
                     </div>
                 </div>
@@ -111,11 +108,11 @@ export function Project() {
                         ref={playerRef}
                         url={videoFilePath}
                         controls={true}
-                        onSeek={handleSeekChange}
+                        // onSeek={handleSeekChange}
                         onDuration={handleDuration}
                         onProgress={handleProgress}
                     />
-                    <h>Currently at: {playerState.played} seconds</h>
+                    <h4>Current video playing: {(videoFilePath).slice(21)}</h4>
                 </div>
 
                 <div className='display-side-right'></div>
@@ -128,6 +125,7 @@ export function Project() {
                 startIndex={project.start_index}
                 endIndex={project.end_index}
                 cursorPosition={playerState.cursorPosition}
+                selectedVideoStream={selectedVideoStream}
                 handleCursorChange={handleCursorChange}
                 handleDisplay={handleDisplay}
             />

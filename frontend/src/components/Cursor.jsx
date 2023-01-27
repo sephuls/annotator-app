@@ -7,7 +7,9 @@ export function Cursor(props) {
             axis='x'
             onDrag={props.handleCursorChange}
             position={props.cursorPosition}
-            bounds={{left: 394, right: 1440}}
+            bounds={{
+                left: 394,
+                right: 1440}}
         >
             <div className="time-cursor">
                 <div className="time-cursor-text"/>

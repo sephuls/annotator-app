@@ -358,7 +358,7 @@ def API_create_data_stream(project_id):
     if project is None:
         return jsonify({'error': 'Project not found'}), 404
 
-    data_stream = DataStream(name="default")
+    data_stream = DataStream(name="myDataStream")
     project.data_streams.append(data_stream)
     db.session.commit()
 
