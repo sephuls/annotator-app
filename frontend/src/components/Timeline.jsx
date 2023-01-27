@@ -17,7 +17,6 @@ export const Timeline = (props) => {
                 const resp = await httpClient.get(`http://localhost:5000/data_streams/${props.projectId}`);
                 if (resp.status !== 204) {
                     setDataStreams(resp.data);
-                    console.log(resp.data);
                 } else {
                     console.log('No projects found');
                 }
@@ -33,7 +32,6 @@ export const Timeline = (props) => {
                 const resp = await httpClient.get(`http://localhost:5000/annotation_streams/${props.projectId}`);
                 if (resp.status !== 204) {
                     setAnnotationStreams(resp.data);
-                    console.log(resp.data);
                 } else {
                     console.log('No projects found');
                 }

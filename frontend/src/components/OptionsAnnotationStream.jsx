@@ -15,13 +15,21 @@ export function OptionsAnnotationStream(props) {
 
     return (
         <div className='timeline-row-options'>
-            Annotation Stream: {props.annotationStream.name} {props.annotationStream.id}
-            <button onClick={handleDeleteAnnotationStream}>Delete Annotation Stream</button>
-            <button onClick={props.handleSubmitAnnotation}>
-                {props.annotationStart
-                ? 'Set end'
-                : 'Set start'}
-            </button>
+            <div className="timeline-row-options-naming">
+                Annotation Stream: {props.annotationStream.name} {props.annotationStream.id}
+            </div>
+            <div className="timeline-row-options-buttons">
+                <button
+                    className="timeline-row-button"
+                    onClick={props.handleSubmitAnnotation}
+                    style={{'backgroundColor': 'rgba(255, 0, 0, 0.383)'}}
+                >
+                    {props.annotationStart
+                    ? 'End annotation'
+                    : 'Start annotation'}
+                </button>
+                <button className="timeline-row-button" onClick={handleDeleteAnnotationStream}>Delete Annotation Stream</button>
+            </div>
         </div>
     );
 }

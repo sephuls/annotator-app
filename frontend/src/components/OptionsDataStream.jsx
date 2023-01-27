@@ -66,26 +66,43 @@ export function OptionsDataStream(props) {
 
     return (
         <div className='timeline-row-options'>
-            Data Stream: {props.dataStream.name} {props.dataStream.id}
-            {props.dataStream.video_stream !== null
-            ? <button onClick={(e) => {handleVideoStreamDelete(e, props.dataStream.id)}}>Delete Video Stream</button>
-            : <UploadButton
-                    dataStreamId={props.dataStream.id}
-                    name='Video Stream'
-                    handleUpload={(e) => {handleVideoStreamUpload(e, props.dataStream.id)}}
-                />
-            }
+            <div className="timeline-row-options-naming">
+                Data Stream: {props.dataStream.name} {props.dataStream.id}
+            </div>
+            <div className="timeline-row-options-buttons">
+                {props.dataStream.video_stream !== null
+                ? <div>
+                    <button
+                        style={{'backgroundColor': 'rgba(30, 255, 0, 0.387)'}}
+                        className="timeline-row-button"
+                        onClick={(e) => {handleSync(e, props.dataStream.id)}}
+                    >Sync</button>
+                    <button
+                        style={{'backgroundColor': 'rgba(255, 255, 0, 0.383)'}}
+                        className="timeline-row-button"
+                        onClick={(e) => {props.handleDisplay(e, props.dataStream.video_stream)}}
+                    >Display</button>
+                    <button
+                        className="timeline-row-button"
+                        onClick={(e) => {handleVideoStreamDelete(e, props.dataStream.id)}}
+                    >Delete Video Stream</button>
+                </div>
+                : <UploadButton
+                        dataStreamId={props.dataStream.id}
+                        name='Video Stream'
+                        handleUpload={(e) => {handleVideoStreamUpload(e, props.dataStream.id)}}
+                    />
+                }
 
-            {props.dataStream.mocap_stream !== null
-            ? <button onClick={(e) => {handleMoCapStreamDelete(e, props.dataStream.id)}}>Delete MoCap Stream</button>
-            : <UploadButton
-                    dataStreamId={props.dataStream.id}
-                    name='MoCap Stream'
-                    handleUpload={(e) => {handleMoCapStreamUpload(e, props.dataStream.id)}}
-                />
-            }
-            <button className="button-sync" onClick={(e) => {handleSync(e, props.dataStream.id)}}>Sync</button>
-            <button className="button-sync" onClick={(e) => {props.handleDisplay(e, props.dataStream.video_stream)}}>Display</button>
+                {props.dataStream.mocap_stream !== null
+                ? <button className="timeline-row-button" onClick={(e) => {handleMoCapStreamDelete(e, props.dataStream.id)}}>Delete MoCap Stream</button>
+                : <UploadButton
+                        dataStreamId={props.dataStream.id}
+                        name='MoCap Stream'
+                        handleUpload={(e) => {handleMoCapStreamUpload(e, props.dataStream.id)}}
+                    />
+                }
+            </div>
         </div>
     );
 }

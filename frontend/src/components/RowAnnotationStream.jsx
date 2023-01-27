@@ -32,7 +32,7 @@ export function RowAnnotationStream(props) {
         } else {
             setAnnotationStart(posToIndex(props.cursorPosition.x))
             console.log(posToIndex(props.cursorPosition.x));
-            // window.location.reload(false);
+            console.log(posToIndex(400));
         }
     };
 

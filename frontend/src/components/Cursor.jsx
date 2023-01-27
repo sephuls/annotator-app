@@ -6,11 +6,12 @@ export function Cursor(props) {
         <Draggable
             axis='x'
             onDrag={props.handleCursorChange}
-            defaultPosition={{x: 0, y: 0}}
             position={props.cursorPosition}
             bounds={{left: 394, right: 1440}}
         >
-            <div className="time-cursor" >drag me!</div>
+            <div className="time-cursor">
+                <div className="time-cursor-text"/>
+            </div>
         </Draggable>
     );
 }

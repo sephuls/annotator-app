@@ -1,6 +1,6 @@
 export function UploadButton(props) {
     return (
-        <div className='upload-label-button'>
+        <div className='timeline-row-button'>
             <input
                 className='timeline-upload'
                 type="file"

@@ -50,18 +50,27 @@ h1.header {
 
 .display-side-left {
     grid-column: 1;
+    height: 394px;
     background-color: #C5C5C5;
     border: #2000E7 solid 3px;
+}
+
+.export-form {
+    position: relative;
+    width: 100%;
+    background-color: #D9D9D9;
 }
 
 .video-player {
     grid-column: 2;
     background-color: #C5C5C5;
     border: #2000E7 solid 3px;
+    height: 394px;
 }
 
 .display-side-right {
     grid-column: 3;
+    height: 394px;
     background-color: #C5C5C5;
     border: #2000E7 solid 3px;
 }
@@ -70,7 +79,7 @@ h1.header {
     grid-row: 2;
     position: absolute;
     bottom: 0;
-    width: 100%;
+    width: 1440px;
     background-color: #C5C5C5;
     border: #2000E7 solid 3px;
 }
@@ -80,7 +89,20 @@ h1.header {
     height: 280px;
     position: absolute;
     left: 0%;
-    z-index: 1;
+    z-index: 1000;
+}
+
+.time-cursor-text {
+    left: -6px;
+    top: -16px;
+    position: relative;
+
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+
+    border-top: 20px solid #f00;
 }
 
 .timeline-header {
@@ -89,7 +111,7 @@ h1.header {
 
     width: 100%;
     display: grid;
-    grid-template-columns: 394px auto;
+    grid-template-columns: 394px 1040px;
     border-bottom: white solid 3px;
 }
 
@@ -103,9 +125,9 @@ h1.header {
     bottom: 0px;
     right: 0px;
     height: 6px;
-    width: 100%;
+    width: 1040px;
     background:
-     repeating-linear-gradient(to right, red   0 1px, transparent 2px 5%),
+     repeating-linear-gradient(to right, #4a31e9   0 1px, transparent 5px 5%),
      repeating-linear-gradient(to right, black 0 1px, transparent 2px 1%);
   }
 
@@ -116,70 +138,79 @@ h1.header {
 
 .timeline-row {
     height: 40px;
-    width: 100%;
+    width: 1434px;
     display: grid;
-    grid-template-columns: 394px auto;
+    grid-template-columns: 394px 1040px;
     border-bottom: white solid 1px;
 }
 
 .timeline-row-data {
+    grid-column: 2;
 }
 
 .timeline-row-options {
-    height: 100%;
+    display: grid;
+    height: 37px;
     grid-column: 1;
     background-color: #B5B5B5;
     border-right: white solid 1px;
+    /* grid-template-columns: 197px 197px; */
+}
+
+.timeline-row-options-naming {
+    /* grid-column: 1; */
+    /* height: 100%; */
 }
 
 .timeline-upload {
     display: none;
 }
 
-.upload-label-button {
-    appearance: auto;
-    writing-mode: horizontal-tb !important;
-    text-rendering: auto;
-    letter-spacing: normal;
-    word-spacing: normal;
-    line-height: normal;
-    text-transform: none;
-    text-indent: 0px;
-    text-shadow: none;
-    text-align: center;
-    align-items: flex-start;
-    cursor: default;
-    box-sizing: border-box;
-    margin: 0em;
-    padding: 1px 6px;
-    border-width: 2px;
-    border-style: outset;
-    border-color: buttonborder;
-    border-image: initial;
+.timeline-row-options-buttons {
+    /* display: grid; */
+}
 
-    font-size: 0.8em;
+.timeline-row-button {
+    border: rgb(124, 124, 124) solid 1px;
+    background-color: #B5B5B5;
+    font-size: small;
+    /* width: auto; */
+    display: inline-block;
+    padding: 1px 6px;
+    margin: 0px;
     float: right;
-    /* width: 50%;
-    border-radius: 3px; */
-    background-color: rgb(124, 124, 124);
+}
+
+.timeline-row-button:hover {
+    opacity: 0.5;
+}
+
+.timeline-row-button:active {
+    background-color: #767676;
+    box-shadow: 0 1px #666;
+    transform: translateY(1px);
 }
 
 .button-sync {
-    font-size: 0.8em;
-    float: right;
+    /* font-size: 0.8em; */
+
     background-color: rgb(124, 124, 124);
 }
 
 .video-stream {
+    opacity: 0.8;
     position: relative;
     background-color: #F69D33;
     border-radius: 3px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
 .mocap-stream {
+    opacity: 0.8;
     position: relative;
     background-color: #76bd91;
     border-radius: 3px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
 .annotations {
@@ -187,12 +218,13 @@ h1.header {
 }
 
 .annotation {
-    opacity: 0.7;
+    opacity: 0.8;
     position: absolute;
     height: 38px;
     background-color: #bf33f6;
     border-radius: 3px;
     text-align: center;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
 .annotation-unfinished {

@@ -6,7 +6,6 @@ export const ProjectNavigation = () => {
     const [newProjectName, setNewProjectName] = useState("")
 
     const handleSubmit = async () => {
-        console.log(newProjectName)
         const resp = await httpClient.post(`//localhost:5000/project/${newProjectName}/add`);
     };
 
@@ -16,7 +15,6 @@ export const ProjectNavigation = () => {
                 const resp = await httpClient.get('http://localhost:5000/projects');
                 if (resp.status !== 204) {
                     setProjects(resp.data);
-                    console.log(resp.data);
                 } else {
                     console.log('No projects found');
                 }

@@ -2,20 +2,28 @@ import { useEffect, useState, useRef } from 'react';
 import { Timeline } from '../components/Timeline';
 import httpClient from "../httpClient"
 import ReactPlayer from 'react-player'
+import useLocalStorage from "use-local-storage";
 
 
 export function Project() {
-    const playerRef = useRef(null);
-    const [playerState, setPlayerState] = useState({
-        played: 0,
-        duration: 0,
-        cursorPosition: {x: 394, y: 0}
-    });
-
-    const [projectId, setProjectId] = useState(1);
+    const projectId = 1;
     const [project, setProject] = useState({});
+    const [videoFilePath, setVideoFilePath] = useLocalStorage(
+        'videoFilePath', {}
+    );
+    const playerRef = useRef(null);
+    const [playerState, setPlayerState] = useLocalStorage(
+        'playerState',
+        {
+            played: 0,
+            duration: 0,
+            cursorPosition: {x: 394, y: 0}
+        }
+    );
 
-    const [videoFilePath, setVideoFilePath] = useState(null);
+    useEffect(() => {
+        playerRef.current.seekTo((playerState.cursorPosition.x - 394) / 1040)
+    });
 
     const handleVideoUpload = (event) => {
         setVideoFilePath(URL.createObjectURL(event.target.files[0]));
@@ -24,17 +32,17 @@ export function Project() {
     const handleSeekChange = (e) => {
         setPlayerState({
             ...playerState,
-            played: parseFloat(e.target.value),
+            // played: parseFloat(e.target.value),
         })
     }
 
     const handleCursorChange = (e, data) => {
         setPlayerState({
             ...playerState,
-            played: data.x * playerState.duration / 1440,
+            played: (data.x - 394) * playerState.duration / 1040,
             cursorPosition: {x: data.x, y: 0}
         })
-        playerRef.current.seekTo(data.x / 1440)
+        playerRef.current.seekTo((data.x - 394) / 1040)
     }
 
     const handleDuration = (e) => {
@@ -49,7 +57,7 @@ export function Project() {
             ...playerState,
             played: parseFloat(state.playedSeconds),
             cursorPosition: {
-                x: state.played * 1440,
+                x: 394 + state.played * 1040,
                 y: 0
             }
         })
@@ -59,7 +67,6 @@ export function Project() {
         try {
             httpClient.get(`http://localhost:5000/export/${projectId}`)
             .then(resp => {
-                // window.location.reload(false);
                 console.log('export', resp.data);
             })
         } catch (ex) {
@@ -91,23 +98,24 @@ export function Project() {
         <div className="content">
             <div className='display'>
                 <div className='display-side-left'>
-                    <input type="file" onChange={handleVideoUpload} />
-                        <p>Played: {playerState.played} Duration: {playerState.duration} Position: {playerState.cursorPosition.x}</p>
+
+                    <div className='export-form'>
                         <form action={`http://localhost:5000/export/${projectId}`}>
                             <input type="submit" value="Export" />
                         </form>
+                    </div>
                 </div>
 
                 <div className='video-player'>
                     <ReactPlayer
                         ref={playerRef}
                         url={videoFilePath}
-                        // url={'06-V1-declarative-M.mp4'}
                         controls={true}
                         onSeek={handleSeekChange}
                         onDuration={handleDuration}
                         onProgress={handleProgress}
                     />
+                    <h>Currently at: {playerState.played} seconds</h>
                 </div>
 
                 <div className='display-side-right'></div>
