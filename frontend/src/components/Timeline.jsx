@@ -50,6 +50,7 @@ export const Timeline = (props) => {
                         endIndex={props.endIndex}
                         key={index}
                         handleDisplay={props.handleDisplay}
+                        setVideoFilePath={props.setVideoFilePath}
                     />;
         } else if (index < (dataStreams.length + annotationStreams.length)) {
             return <RowAnnotationStream

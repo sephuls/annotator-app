@@ -9,8 +9,9 @@ export function Project() {
     const projectId = 1;
     const [project, setProject] = useState({});
     const [videoFilePath, setVideoFilePath] = useLocalStorage(
-        'videoFilePath', {}
+        'videoFilePath', ""
     );
+    // localStorage.removeItem('videoFilePath');
     const [selectedVideoStream, setSelectedVideoStream] = useLocalStorage(
         'selectedVideoStream', {
             'start': 0,
@@ -114,10 +115,7 @@ export function Project() {
                     />
                     <h4>Current video playing: {(videoFilePath).slice(21)}</h4>
                 </div>
-
                 <div className='display-side-right'></div>
-
-
             </div>
 
             <Timeline
@@ -128,6 +126,7 @@ export function Project() {
                 selectedVideoStream={selectedVideoStream}
                 handleCursorChange={handleCursorChange}
                 handleDisplay={handleDisplay}
+                setVideoFilePath={setVideoFilePath}
             />
         </div>
     );

@@ -21,6 +21,7 @@ export function OptionsDataStream(props) {
         try {
             httpClient.delete(`http://localhost:5000/video_streams/${dataStreamId}`)
             .then(resp => {
+                props.setVideoFilePath('');
                 window.location.reload(false);
             })
         } catch (ex) {

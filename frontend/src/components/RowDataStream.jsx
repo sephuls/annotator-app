@@ -9,6 +9,7 @@ export function RowDataStream(props) {
                 projectId={props.projectId}
                 dataStream={props.dataStream}
                 handleDisplay={props.handleDisplay}
+                setVideoFilePath={props.setVideoFilePath}
             />
             <div className='timeline-row-data'>
                 <DataStream

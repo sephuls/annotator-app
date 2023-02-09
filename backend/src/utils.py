@@ -57,7 +57,7 @@ def get_timecode_QR(media_file: str, mirrored: bool = False) -> Tuple[int, datet
     cv2.destroyAllWindows()
 
     if value != '':
-        return frame_nr, datetime.strptime(value, "oT%y%m%d%H%M%S.%f")
+        return frame_nr, datetime.strptime(value[:-7], "oT%y%m%d%H%M%S.%f")
 
     return None, None
 

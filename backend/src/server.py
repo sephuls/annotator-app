@@ -256,7 +256,11 @@ def API_delete_video_stream(data_stream_id):
     data_stream.start_index = 0
     data_stream.end_index = 0
 
-    os.remove(data_stream.video_stream.file_path)
+    try:
+        os.remove(data_stream.video_stream.file_path)
+    except:
+        pass
+
     db.session.delete(data_stream.video_stream)
     db.session.commit()
 
@@ -336,10 +340,16 @@ def API_sync_data_stream(project_id, data_stream_id):
     if not succes:
         return jsonify({'error': 'Error while attempting to synchronise data stream'}), 500
 
-    if project.start_index is None or data_stream.start_index < project.start_index:
+    num_video_streams = len([ds for ds in project.data_streams if ds.video_stream is not None])
+
+    if (project.start_index is None
+        or data_stream.start_index < project.start_index
+        or num_video_streams == 1):
         project.start_index = data_stream.start_index
 
-    if project.end_index is None or data_stream.end_index > project.end_index:
+    if (project.end_index is None
+        or data_stream.end_index > project.end_index
+        or num_video_streams == 1):
         project.end_index = data_stream.end_index
 
     db.session.commit()
@@ -573,10 +583,17 @@ def API_export_data(project_id):
         annotation_set['mocap_streams'] = []
 
         for mo_str in mocap_streams:
-            annotation_set['mocap_streams'].append({
-                'name': mo_str['name'],
-                'mocap_data': mo_str['mocap_data'].loc[int(annotation.start_index):int(annotation.end_index)].to_dict(orient='records')
-            })
+            if len(mo_str['mocap_data'].columns) == 3:
+                mo_str['mocap_data'].columns = ['x', 'y', 'z']
+                annotation_set['mocap_streams'].append({
+                    'name': mo_str['name'],
+                    'mocap_data': mo_str['mocap_data'].loc[int(annotation.start_index):int(annotation.end_index)].to_dict(orient='records')
+                })
+            else:
+                annotation_set['mocap_streams'].append({
+                    'name': mo_str['name'],
+                    'mocap_data': mo_str['mocap_data'].loc[int(annotation.start_index):int(annotation.end_index)].to_dict(orient='records')
+                })
 
         export['annotations'].append(annotation_set)
 
